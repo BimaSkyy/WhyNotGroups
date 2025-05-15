@@ -5,6 +5,7 @@
   <title>JSON Aset</title>
   <script>
     const symbols = ["PEPEUSDT", "TSTUSDT", "TONUSDT", "ETHUSDT"];
+
     const promises = symbols.map(sym =>
       fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${sym}`).then(res => res.json())
     );
@@ -16,9 +17,18 @@
           "$": `$${parseFloat(data.lastPrice).toFixed(6)}`,
           "%": `${parseFloat(data.priceChangePercent).toFixed(2)}%`
         }));
-        document.open();
-        document.write(JSON.stringify(result, null, 2));
-        document.close();
+
+        // Ubah MIME type agar bot bisa detect JSON
+        const blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          document.open();
+          document.write(reader.result);
+          document.close();
+        };
+
+        reader.readAsText(blob);
       })
       .catch(err => {
         document.open();
