@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>JSON Aset</title>
+  <script>
+    const symbols = ["PEPEUSDT", "TSTUSDT", "TONUSDT", "ETHUSDT"];
+    const promises = symbols.map(sym =>
+      fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${sym}`).then(res => res.json())
+    );
+
+    Promise.all(promises)
+      .then(datas => {
+        const result = datas.map((data, i) => ({
+          aset: symbols[i].replace("USDT", "/USDT"),
+          "$": `$${parseFloat(data.lastPrice).toFixed(6)}`,
+          "%": `${parseFloat(data.priceChangePercent).toFixed(2)}%`
+        }));
+        document.open();
+        document.write(JSON.stringify(result, null, 2));
+        document.close();
+      })
+      .catch(err => {
+        document.open();
+        document.write(JSON.stringify({ error: "Gagal memuat data" }));
+        document.close();
+      });
+  </script>
+</head>
+<body>
+</body>
+</html>
